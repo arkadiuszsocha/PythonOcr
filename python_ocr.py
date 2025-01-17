@@ -24,7 +24,7 @@ def preprocess_image(image_path):
 
     return resized
 
-def process_folder_with_easyocr(folder_path):
+def process_folder_with_easyocr(folder_path, preprocess=True):
     # Initialize EasyOCR Reader
     reader = easyocr.Reader(['pl'], gpu=False)  # Add more languages if needed
 
@@ -44,12 +44,16 @@ def process_folder_with_easyocr(folder_path):
             file_path = os.path.join(folder_path, filename)
             print(f"Processing: {filename}")
 
-            # Preprocess the image
+            # Preprocess the image if the preprocess flag is True
             try:
-                preprocessed_image = preprocess_image(file_path)
-                # Perform OCR on the preprocessed image
+                if preprocess:
+                    image = preprocess_image(file_path)
+                else:
+                    image = file_path  # Use the original image path
+
+                # Perform OCR on the image
                 results = reader.readtext(
-                    preprocessed_image, 
+                    image, 
                     detail=1, 
                     paragraph=True, 
                     text_threshold=0.7, 
@@ -80,7 +84,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     folder_path = sys.argv[1]
-    process_folder_with_easyocr(folder_path)
+    process_folder_with_easyocr(folder_path, preprocess=False)
 
 
 
